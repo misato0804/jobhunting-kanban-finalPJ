@@ -82,8 +82,6 @@ const CompanyEditModal = ({setShowModal, status,name, jobtype,link,description,c
         setShowModal(false)
     }
 
-
-
     return (
         <div className="bg-modal relative z-[1001]">
             <div ref={ref} className="modal-container wrapper py-6">

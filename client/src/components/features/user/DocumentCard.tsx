@@ -3,10 +3,6 @@ import pdf from "../../../images/pdf.png";
 import word from "../../../images/word.png";
 import excel from "../../../images/excel.png"
 
-type documentCard = {
-    name: string
-}
-
 const DocumentCard = () => {
 
     const getIcon = (type: string) => {

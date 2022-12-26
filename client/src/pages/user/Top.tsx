@@ -22,13 +22,10 @@ const TopPage = () => {
     useCompaniesContext();
   const { seekerState } = useAuthContext();
   const { seekerLoading } = seekerState;
-  const { companies } = companyState;
   const [childComponent, setChildComponent] = useState<ReactNode>(
     <Interested />
   );
   const { showPage, setShowPage } = useCompanyContext();
-
-  console.log(companies);
 
   useFetchCompany({
     method: "get",

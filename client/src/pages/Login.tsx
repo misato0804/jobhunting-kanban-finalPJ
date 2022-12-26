@@ -15,10 +15,9 @@ const Login = () => {
 
     const [email, setEmail] = useState<string>("")
     const [password, setPassword] = useState<string>("")
-
-    const [cookies, setCookie] = useCookies();
     const navigate = useNavigate();
     const {seekerState, seekerDispatch} = useAuthContext();
+    const [cookie, setCookie] = useCookies()
 
     const LoginUser = async (e: React.SyntheticEvent) => {
         e.preventDefault();

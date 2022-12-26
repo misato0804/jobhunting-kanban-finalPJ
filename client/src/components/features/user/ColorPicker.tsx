@@ -8,8 +8,6 @@ type Props = {
 }
 
 const ColorPicker = ({setColor, color, showColorPallet,setShowColorPallet} : Props) => {
-
-
     return (
         <div className="font-thin flex items-center gap-2 cursor-pointer relative">
             <div

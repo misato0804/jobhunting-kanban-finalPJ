@@ -3,7 +3,6 @@ import {SlCalender} from "react-icons/sl";
 import InputField from "../../components/models/InputField";
 import Text_field_lg from "../../components/models/Text_field_lg";
 import Button_sm from "../../components/models/Button_sm";
-import {Schedule} from "../../types/Schedule";
 import ColorPicker from "../../components/features/user/ColorPicker";
 import {useScheduleContext} from "../../components/context/scheduleContext";
 
@@ -29,7 +28,6 @@ const ScheduleModal = ({setShowScheduleModal, seeker_id, company_id}: Props) => 
 
     const [showColorPallet, setShowColorPallet] = useState<boolean>(false)
     const {createSchedule} = useScheduleContext();
-
     const startDateRef = useRef<HTMLInputElement>(null)
     const startTimeRef = useRef<HTMLInputElement>(null)
     const endDateRef = useRef<HTMLInputElement>(null)
@@ -68,7 +66,6 @@ const ScheduleModal = ({setShowScheduleModal, seeker_id, company_id}: Props) => 
     }
 
     const createScheduleWithServer = () => {
-        console.log(newSchedule)
         createSchedule(newSchedule)
         setShowScheduleModal(false)
     }

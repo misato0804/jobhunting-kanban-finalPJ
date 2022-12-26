@@ -11,11 +11,8 @@ type EventDetailProps = {
 }
 
 const EventDetail = ({selectedEvent}: EventDetailProps) => {
-
     const [showScheduleEditModal, setShowScheduleEditModal] = useState<boolean>(false)
     const {deleteSchedule} = useScheduleContext()
-
-    console.log(selectedEvent)
 
     const getDay = (day: Date, start: boolean) => {
         const date = day.toString().slice(0, 10)
