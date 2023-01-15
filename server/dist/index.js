@@ -11,18 +11,18 @@ const companyRoutes_1 = __importDefault(require("./routes/companyRoutes"));
 const seekerRoutes_1 = __importDefault(require("./routes/seekerRoutes"));
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const scheduleRoutes_1 = __importDefault(require("./routes/scheduleRoutes"));
-const multer_1 = __importDefault(require("multer"));
 // import
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-const port = 8080;
-const storage = multer_1.default.memoryStorage();
-const upload = (0, multer_1.default)({ storage });
 const corsOptions = {
-    origin: "http://localhost:3000",
+    origin: true,
     credentials: true,
 };
 // middleware
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    next();
+});
 app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
@@ -37,6 +37,6 @@ app.get("/", (req, res) => {
 app.all("*", (req, res, next) => {
     next();
 });
-app.listen(port, () => {
-    console.log(`[server] server is listening on port ${port}`);
+app.listen(process.env.PORT || 8080, () => {
+    console.log(`[server] server is listening on port`);
 });

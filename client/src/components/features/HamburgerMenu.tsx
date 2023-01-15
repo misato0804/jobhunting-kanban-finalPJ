@@ -15,7 +15,7 @@ const HamburgerMenu = ({isOpen, setMenuOpen}: Props) => {
     const logout = () => {
         setMenuOpen(false)
         removeCookie("JWT_TOKEN");
-        removeCookie("seeker_id");
+        removeCookie("SEEKER_ID");
         navigate("/", { replace: true });
     }
 
@@ -23,10 +23,6 @@ const HamburgerMenu = ({isOpen, setMenuOpen}: Props) => {
         name: string;
         to: string;
     }
-
-    /**
-     * TODO : CHANGE ROUTE
-     */
 
     const links: link[] = [
         {
@@ -38,15 +34,7 @@ const HamburgerMenu = ({isOpen, setMenuOpen}: Props) => {
             to: "/calendar"
         },
         {
-            name: "Your Journey",
-            to: "/calendar"
-        },
-        {
             name: "Map",
-            to: "/map"
-        },
-        {
-            name: "Documents",
             to: "/map"
         }
     ]
@@ -77,7 +65,7 @@ const HamburgerMenu = ({isOpen, setMenuOpen}: Props) => {
                     <IoCloseOutline color={"white"} size={30}/>
                 </div>
                 <ul>
-                    {cookies.JWT_TOKEN ?
+                    {cookies.JWT_TOKEN  ?
                         links.map(link =>
                             <li
                                 key={link.name}

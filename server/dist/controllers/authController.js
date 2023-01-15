@@ -55,7 +55,7 @@ exports.loginSeeker = (0, middlewares_1.catchAsync)((req, res, next) => __awaite
     next();
 }));
 exports.signupSeeker = (0, middlewares_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, email, password, passwordConfirmation } = req.body;
+    const { name, email, password, passwordConfirmation, } = req.body;
     if (!name || !email || !password || !passwordConfirmation)
         next(new Error("Invalid inputs"));
     if (password !== passwordConfirmation)
@@ -68,14 +68,8 @@ exports.signupSeeker = (0, middlewares_1.catchAsync)((req, res, next) => __await
         next(new Error("Failed to register new seeker"));
     // create token
     const token = createToken(newSeekerData.rows[0].seeker_id);
-    const newSeeker = newSeekerData.rows[0];
-    res
-        // .cookie("access_token", token, {
-        //   httpOnly: true,
-        //   secure: process.env.NODE_ENV === "production",
-        // })
-        .status(200)
-        .json({ msg: "good signup", token, newSeeker });
+    const seeker = newSeekerData.rows[0];
+    res.status(200).json({ msg: "good signup", token, seeker });
     next();
 }));
 exports.logoutSeeker = (0, middlewares_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -99,13 +93,13 @@ exports.authorization = (0, middlewares_1.catchAsync)((req, res, next) => __awai
             next(new Error("Invalid token"));
         return next();
     }
-    catch (_c) {
+    catch (err) {
+        console.log(err);
         return next(new Error("Invalid token"));
     }
 }));
 exports.testHandler = (0, middlewares_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const token = req.cookies.access_token;
-    console.log(token);
     res.json({ msg: "test is successfully done." });
     next();
 }));

@@ -1,47 +1,56 @@
-import React, {LegacyRef, MutableRefObject, useEffect, useRef, useState} from 'react';
+import React, { useEffect, useState } from "react";
 import CompanyCard from "../CompanyCard";
-import {useCompanyContext} from "../../../context/companyContext";
-import {Company} from "../../../../types/Company";
+import { Company } from "../../../../types/Company";
 import EmptyCompany from "../EmptyCompany";
-import {useSeekerContext} from "../../../context/seekerContext";
+import { useAuthContext } from "../../../context/AuthContext";
+import { useCompaniesContext } from "../../../context/companiesContext";
 
 const Interested = () => {
+  const { companyState, filteredChildren } = useCompaniesContext();
+  const { companies } = companyState;
+  const InterestedArr = companies.filter(
+    (company) => company.status === "Interested"
+  );
+  const [filtered, setFiltered] = useState<Company[]>(InterestedArr);
+  const { seekerState } = useAuthContext();
 
-    const {filteredChildren, companies} = useCompanyContext();
-    const [filtered, setFiltered] = useState<Company[]>(companies);
-    const {seeker} = useSeekerContext()
+  useEffect(() => {
+    if (InterestedArr.length > 0 && filteredChildren.length > 0) {
+      let filteredArray = InterestedArr.filter((company) =>
+        company.name.includes(filteredChildren)
+      );
+      setFiltered(filteredArray);
+    } else if (filteredChildren.length === 0) {
+      setFiltered(InterestedArr);
+    }
+  }, [filteredChildren]);
 
-    useEffect(() => {
-        if (companies.length > 0 && filteredChildren.length > 0) {
-            let filteredArray = companies.filter(company => company.name?.includes(filteredChildren))
-            setFiltered(filteredArray)
-            return
-        }
-        setFiltered(companies)
-    }, [filteredChildren])
-
-    return (
-        <section className="interested card-container">
-            {
-                companies.length !== 0 ?
-                    filtered.map((company) =>
-                        <CompanyCard
-                            key={company.company_id}
-                            company_id={company.company_id}
-                            name={company.name}
-                            location={company.location}
-                            link={company.link}
-                            jobtype={company.jobtype}
-                            salary={company.salary}
-                            description={company.description}
-                            status={company.status}
-                            interest={company.interest}
-                            company_size={company.company_size}
-                            seeker_id={seeker!.seeker_id!}
-                        />) : < EmptyCompany/>
-            }
-        </section>
-    );
+  return (
+    <section
+      className={`${InterestedArr.length !== 0 ? "card-container" : null}`}
+    >
+      {InterestedArr.length !== 0 ? (
+        filtered.map((company) => (
+          <CompanyCard
+            key={company.company_id}
+            company_id={company.company_id}
+            name={company.name}
+            location={company.location}
+            link={company.link}
+            jobtype={company.jobtype}
+            salary={company.salary}
+            description={company.description}
+            status={company.status}
+            interest={company.interest}
+            company_size={company.company_size}
+            seeker_id={seekerState.seeker.seeker_id!}
+          />
+        ))
+      ) : (
+        <EmptyCompany companyStatus={"Interested"} />
+      )}
+    </section>
+  );
 };
 
 export default Interested;

@@ -3,10 +3,15 @@ import Button_sm from "../../components/models/Button_sm";
 import Text_field_lg from "../../components/models/Text_field_lg";
 import InputField from "../../components/models/InputField";
 import {BsBuilding} from "react-icons/bs"
-import {useCompanyContext} from "../../components/context/companyContext";
 import {Company, Location} from "../../types/Company";
 import GooglePlace from "../../components/features/user/GooglePlace";
-import {useSeekerContext} from "../../components/context/seekerContext";
+import axios from "axios";
+import {useAuthContext} from "../../components/context/AuthContext";
+import {COMPANY_ACTIONS} from "../../components/context/reducer/CompanyReducer";
+import {useCompaniesContext} from "../../components/context/companiesContext";
+import {getLat, getLng} from "../../components/helper/companyHelper";
+import useDetectClickOutside from "../../hooks/useDetectClickOutside";
+import CompanySizeDropDown from "../../components/features/user/Company page/CompanySizeDropDown";
 
 
 type modalProps = {
@@ -14,10 +19,13 @@ type modalProps = {
     setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+const company_size = ["1-10", "11-50", "50-200","201-500", "501-1000", "1001-"]
+
 const CompanyModal = ({showModal, setShowModal}: modalProps) => {
-    const {createCompany} = useCompanyContext();
-    const {seeker} = useSeekerContext()
+    const {seekerState} = useAuthContext();
+    const {dispatch} = useCompaniesContext();
     const [location, setLocation] = useState<Location>({lat: 49.246292, lng: -123.116226})
+    const {ref, isComponentVisible, setIsComponentVisible} = useDetectClickOutside({initialVisible: false})
     const [companyData, setCompanyData] = useState<Company>({
         name: "",
         link: "",
@@ -27,19 +35,50 @@ const CompanyModal = ({showModal, setShowModal}: modalProps) => {
         salary: "",
         description: "",
         interest: 0,
-        seeker_id: seeker!.seeker_id!
+        seeker_id: seekerState.seeker.seeker_id!
     })
 
     const companyDataHandler = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
         setCompanyData({...companyData, [e.target.name]: e.target.value});
     }
 
-    console.log(companyData)
-    const sendCompany = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const sendCompany = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        createCompany(companyData)
+        try {
+            dispatch({type: COMPANY_ACTIONS.API_CALL, payload: []})
+            let res = await axios({
+                method: "post",
+                url: "http://localhost:8080/companies/new",
+                data: companyData,
+                withCredentials: true,
+                headers: {
+                    authorization: `Bearer ${seekerState.token}`
+                }
+            })
+
+            let getData = await axios({
+                method: "get",
+                url: `http://localhost:8080/companies/${seekerState.seeker.seeker_id}`,
+                headers: {
+                    authorization:`Bearer ${seekerState.token}`
+                },
+                withCredentials : true
+            })
+            const comp : any[] = getData.data.companies
+            comp.forEach( c => {
+                c.location = {lat: parseFloat(
+                    getLat(c.location)), lng:  parseFloat(getLng(c.location))}
+            })
+            res.status === 200 && dispatch({type: COMPANY_ACTIONS.SUCCESS, payload: comp})
+        } catch (e: any) {
+            console.log(e)
+        }
         setShowModal(false)
-        window.location.reload()
+    }
+
+    const handleSetCompany = (e: React.MouseEvent<HTMLLIElement>) => {
+        setCompanyData({...companyData, company_size: e.currentTarget.innerText})
+        setIsComponentVisible(false)
     }
 
     return (
@@ -91,18 +130,17 @@ const CompanyModal = ({showModal, setShowModal}: modalProps) => {
                         location={companyData.location}
                         companyData={companyData}
                         setLocation={setLocation}
-                        setCompanyData = {setCompanyData}
+                        setCompanyData={setCompanyData}
                     />
                 </div>
-                <div>
-                    <InputField
-                        type={"text"}
-                        title={"company size"}
-                        name={"company_size"}
-                        value={companyData.company_size}
-                        placeholder={"company size"}
-                        onChange={companyDataHandler}
-                    />
+                <div className="text-sm relative">
+                    <p>company size</p>
+                    <div
+                        className="cursor-pointer text-gray-400 text-sm font-thin shadow border rounded w-1/2 py-2 px-3 mt-2 leading-tight focus:shadow-outline"
+                        onClick={() => setIsComponentVisible(true)}>
+                        {companyData.company_size.length===0 ? "0-" : companyData.company_size}
+                    </div>
+                    {isComponentVisible && <CompanySizeDropDown onClick={handleSetCompany}/>}
                 </div>
                 <Text_field_lg
                     name={"description"}

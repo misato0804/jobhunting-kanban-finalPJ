@@ -1,145 +1,91 @@
-import React, {ReactNode, useEffect, useState} from 'react';
+import React, { ReactNode, useEffect, useState } from "react";
 import UserNav from "../../components/features/user/UserNav";
 import Interested from "../../components/features/user/Company page/Interested";
 import Applied from "../../components/features/user/Company page/Applied";
 import Rejected from "../../components/features/user/Company page/Rejected";
 import Interview from "../../components/features/user/Company page/Interview";
 import UserProfile from "../../components/features/user/UserProfile";
-import human from "../../images/human.png";
 import Button_sm from "../../components/models/Button_sm";
 import CompanyModal from "./CompanyModal";
 import Search from "../../components/models/Search";
-import {useCompanyContext} from "../../components/context/companyContext";
-import {useSeekerContext} from "../../components/context/seekerContext";
-import axios from "axios";
-import {useCookies} from "react-cookie";
+import { useCompanyContext } from "../../components/context/companyContext";
+import { useCookies } from "react-cookie";
+import { useAuthContext } from "../../components/context/AuthContext";
+import { useCompaniesContext } from "../../components/context/companiesContext";
+import { useFetchCompany } from "../../hooks/useFetchCompany";
+import Loading from "../Loading";
 
 const TopPage = () => {
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [cookies] = useCookies();
+  const { companyState, filteredChildren, setFilteredChildren } =
+    useCompaniesContext();
+  const { seekerState } = useAuthContext();
+  const { seekerLoading } = seekerState;
+  const [childComponent, setChildComponent] = useState<ReactNode>(
+    <Interested />
+  );
+  const { showPage, setShowPage } = useCompanyContext();
 
-    const [showModal, setShowModal] = useState<boolean>(false);
-    const {
-        companies,
-        filteredChildren,
-        setFilteredChildren,
-        showPage,
-        setShowPage,
-        getCompanies,
-        setCompanies
-    } = useCompanyContext()
-    const [childComponent, setChildComponent] = useState<ReactNode>(<Interested/>)
-    const {seeker, loadingSeeker, setLoadingSeeker} = useSeekerContext();
-    const [cookies] = useCookies();
-    const {getSeekerData} = useSeekerContext()
-    const [cookie] = useCookies();
+  useFetchCompany({
+    method: "get",
+    url: `/companies/${cookies.SEEKER_ID}`,
+    headers: {
+      authorization: `Bearer ${cookies.JWT_TOKEN}`,
+    },
+    withCredentials: true,
+  });
 
-    useEffect(() => {
-        // getCompanies(seeker!.seeker_id!)
-        const pageRender = async () => {
-            if (showPage === "Interested") {
-                try {
-                    let res = await axios({
-                        method: "get",
-                        url: `http://localhost:8080/companies/${seeker!.seeker_id}/Interested`,
-                        headers: {
-                            authorization: `Bearer ${cookies.JWT_TOKEN}`
-                        },
-                        withCredentials: true
-                    })
-                    setCompanies(res.data.companiesWithStatus);
-                } catch (err: any) {
-                    console.log(err)
-                }
-                setChildComponent(<Interested/>)
-            } else if (showPage === "Applied") {
-                try {
-                    let res = await axios({
-                        method: "get",
-                        url: `http://localhost:8080/companies/${seeker!.seeker_id}/Applied`,
-                        headers: {
-                            authorization: `Bearer ${cookies.JWT_TOKEN}`
-                        },
-                        withCredentials: true
-                    })
-                    setCompanies(res.data.companiesWithStatus);
-                } catch (err: any) {
-                    console.log(err)
-                }
-                setChildComponent(<Applied/>)
-            } else if (showPage === "Interview") {
-                try {
-                    let res = await axios({
-                        method: "get",
-                        url: `http://localhost:8080/companies/${seeker!.seeker_id}/Interview`,
-                        headers: {
-                            authorization: `Bearer ${cookies.JWT_TOKEN}`
-                        },
-                        withCredentials: true
-                    })
-                    setCompanies(res.data.companiesWithStatus);
-                } catch (err: any) {
-                    console.log(err)
-                }
-                setChildComponent(<Interview/>)
-            } else if (showPage === "Rejected") {
-                try {
-                    let res = await axios({
-                        method: "get",
-                        url: `http://localhost:8080/companies/${seeker!.seeker_id}/Rejected`,
-                        headers: {
-                            authorization: `Bearer ${cookies.JWT_TOKEN}`
-                        },
-                        withCredentials: true
-                    })
-                    setCompanies(res.data.companiesWithStatus);
-                } catch (err: any) {
-                    console.log(err)
-                }
-                setChildComponent(<Rejected/>)
-            } else {
-                return
-            }
-        }
-        pageRender()
-    }, [showPage])
+  const modalHandler = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    showModal ? setShowModal(false) : setShowModal(true);
+  };
 
-    const modalHandler = (e: React.MouseEvent<HTMLElement>) => {
-        e.preventDefault();
-        showModal ? setShowModal(false) : setShowModal(true)
+  useEffect(() => {
+    switch (showPage) {
+      case "Interested":
+        setChildComponent(<Interested />);
+        break;
+      case "Applied":
+        setChildComponent(<Applied />);
+        break;
+      case "Interview":
+        setChildComponent(<Interview />);
+        break;
+      case "Rejected":
+        setChildComponent(<Rejected />);
+        break;
+      default:
+        return;
     }
+  }, [showPage]);
 
-    return (
-        <>
-            <div className="wrapper lg:grid grid-cols-5 gap-2 min-h-screen">
-                < UserProfile
-                    name={seeker!.name}
-                    email={seeker!.email}
-                    avatar={seeker!.avatar ? seeker!.avatar : human}
-                />
-                <div className="lg:col-span-4">
-                    <UserNav
-                        showPage={showPage}
-                        setShowPage={setShowPage}
-                    />
-                    <div className="lg:grid lg:grid-cols-9 lg:gap-4 mt-4">
-                        < Search
-                            filteredChildren={filteredChildren}
-                            setFilteredChildren={setFilteredChildren}
-                        />
-                        <Button_sm
-                            title={"New"}
-                            color={"text-white"}
-                            bg_color={"bg-content-blue"}
-                            width={"w-full my-2 lg:my-0"}
-                            className={"block col-span-2"}
-                            onClick={modalHandler}
-                        />
-                    </div>
-                    {!loadingSeeker ? childComponent : <h1>Loading....</h1>}
-                </div>
-                {showModal && < CompanyModal showModal={showModal} setShowModal={setShowModal}/>}
-            </div>
-        </>
-    );
+  return (
+    <div className="wrapper lg:grid grid-cols-5 gap-2 min-h-screen">
+      {seekerLoading ? <Loading /> : <UserProfile />}
+      <div className="lg:col-span-4">
+        <UserNav showPage={showPage} setShowPage={setShowPage} />
+        <div className="lg:grid lg:grid-cols-9 lg:gap-4 mt-4">
+          <Search
+            filteredChildren={filteredChildren}
+            setFilteredChildren={setFilteredChildren}
+          />
+          <Button_sm
+            title={"New"}
+            color={"text-white"}
+            bg_color={"bg-content-blue"}
+            width={"w-full my-2 lg:my-0"}
+            className={"block col-span-2"}
+            onClick={modalHandler}
+          />
+        </div>
+        {companyState.loading ? <h1>Loading</h1> : childComponent}
+      </div>
+      {showModal && (
+        <CompanyModal showModal={showModal} setShowModal={setShowModal} />
+      )}
+    </div>
+  );
 };
 
 export default TopPage;

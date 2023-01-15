@@ -1,4 +1,5 @@
 import express from "express";
+import multer from "multer";
 import { authorization } from "../controllers/authController";
 import {
   getSeekerInfo,
@@ -6,8 +7,11 @@ import {
   addAvatar,
   getAvatar,
   updateAvatar,
+  updateSeekerLocation,
 } from "../controllers/seekerController";
 const seekerRouter = express.Router();
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 seekerRouter
   .route("/:seeker_id")
@@ -16,7 +20,10 @@ seekerRouter
 seekerRouter
   .route("/avatar/:seeker_id")
   .get(authorization, getAvatar)
-  .post(authorization, addAvatar)
-  .put(authorization, updateAvatar);
+  .post(authorization, upload.single("image"), addAvatar)
+  .patch(authorization, updateAvatar);
+seekerRouter
+  .route("/location/:seeker_id")
+  .patch(authorization, updateSeekerLocation);
 
 export default seekerRouter;
