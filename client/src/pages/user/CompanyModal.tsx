@@ -19,6 +19,8 @@ type modalProps = {
     setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+const company_size = ["1-10", "11-50", "50-200","201-500", "501-1000", "1001-"]
+
 const CompanyModal = ({showModal, setShowModal}: modalProps) => {
     const {seekerState} = useAuthContext();
     const {dispatch} = useCompaniesContext();

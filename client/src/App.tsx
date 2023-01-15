@@ -1,6 +1,5 @@
-import React, {useEffect, useState} from "react";
 import Header from "./components/features/Header";
-import {Outlet, Route, Routes} from "react-router-dom";
+import { Outlet, Route, Routes } from "react-router-dom";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Hero from "./pages/Hero";
@@ -16,37 +15,36 @@ import ProtectRoutes from "./components/features/ProtectRoutes";
 import Testing from "./components/features/test/Testing";
 
 function App() {
-
-    return (
-        <div className="App">
-            <Header/>
-            <Routes>
-                <Route path="/" element={<Hero/>}/>
-                <Route path="/signup" element={<Signup/>}/>
-                <Route path="/login" element={<Login/>}/>
-                <Route element={<ProtectRoutes/>}>
-                    <Route
-                        path="/user"
-                        element={
-                            <>
-                                <TopPage/>
-                                <Outlet/>
-                            </>
-                        }
-                    >
-                        <Route path="interested" element={<Interested/>}/>
-                        <Route path="applied" element={<Applied/>}/>
-                        <Route path="interview" element={<Interview/>}/>
-                        <Route path="rejected" element={<Rejected/>}/>
-                    </Route>
-                    <Route path="/calendar" element={<Calendar/>}/>
-                    <Route path="/map" element={<CompanyMap/>}/>
-                    <Route path="/testing" element={<Testing/>}/>
-                </Route>
-            </Routes>
-            <Footer/>
-        </div>
-    );
+  return (
+    <div className="App">
+      <Header />
+      <Routes>
+        <Route path="/" element={<Hero />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route element={<ProtectRoutes />}>
+          <Route
+            path="/user"
+            element={
+              <>
+                <TopPage />
+                <Outlet />
+              </>
+            }
+          >
+            <Route path="interested" element={<Interested />} />
+            <Route path="applied" element={<Applied />} />
+            <Route path="interview" element={<Interview />} />
+            <Route path="rejected" element={<Rejected />} />
+          </Route>
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/map" element={<CompanyMap />} />
+          <Route path="/testing" element={<Testing />} />
+        </Route>
+      </Routes>
+      <Footer />
+    </div>
+  );
 }
 
 export default App;

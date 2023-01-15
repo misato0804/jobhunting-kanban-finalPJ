@@ -76,13 +76,7 @@ export const signupSeeker = catchAsync(
     // create token
     const token = createToken(newSeekerData.rows[0].seeker_id);
     const seeker = newSeekerData.rows[0];
-    res
-      // .cookie("access_token", token, {
-      //   httpOnly: true,
-      //   secure: process.env.NODE_ENV === "production",
-      // })
-      .status(200)
-      .json({ msg: "good signup", token, seeker });
+    res.status(200).json({ msg: "good signup", token, seeker });
     next();
   }
 );
@@ -103,13 +97,14 @@ export const authorization = catchAsync(
       !req.headers.authorization?.startsWith("Bearer")
     )
       next(new Error("You're not authorized."));
-    const token: string | undefined = req.headers.authorization?.split(" ")[1];
+    const token: string = req.headers.authorization?.split(" ")[1]!;
     if (!token) next(new Error("No token found."));
     try {
-      const jwtData = jwt.verify(token!, JWT_SECRET_KEY);
+      const jwtData = jwt.verify(token, JWT_SECRET_KEY);
       if (!jwtData) next(new Error("Invalid token"));
       return next();
-    } catch {
+    } catch (err) {
+      console.log(err);
       return next(new Error("Invalid token"));
     }
   }
@@ -118,7 +113,6 @@ export const authorization = catchAsync(
 export const testHandler = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies.access_token;
-    console.log(token);
     res.json({ msg: "test is successfully done." });
     next();
   }

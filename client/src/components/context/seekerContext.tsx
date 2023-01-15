@@ -47,11 +47,10 @@ export const SeekerProvider = ({ children }: Props) => {
     try {
       let res = await axios({
         method: "post",
-        url: "http://localhost:8080/auth/signup",
+        url: `${process.env.REACT_APP_PORT}/auth/signup`,
         data: newUser,
         withCredentials: true,
       });
-      console.log(res.data);
       setCookie("JWT_TOKEN", res.data.token);
       setCookie("seeker_id", res.data.seeker_id);
       setSeeker(newUser!);
@@ -64,11 +63,10 @@ export const SeekerProvider = ({ children }: Props) => {
     try {
       let res = await axios({
         method: "post",
-        url: "http://localhost:8080/auth/login",
+        url: `${process.env.REACT_APP_PORT}/auth/login`,
         data: { email, password },
         withCredentials: true,
       });
-      console.log(res.data);
       setCookie("JWT_TOKEN", res.data.token);
       setCookie("seeker_id", res.data.seeker.seeker_id);
       setSeeker(res.data.seeker);
@@ -83,7 +81,7 @@ export const SeekerProvider = ({ children }: Props) => {
     try {
       let res = await axios({
         method: "patch",
-        url: `http://localhost:8080/seekers/${seeker_id}`,
+        url: `${process.env.REACT_APP_PORT}/seekers/${seeker_id}`,
         data,
         withCredentials: true,
         headers: {
@@ -100,7 +98,7 @@ export const SeekerProvider = ({ children }: Props) => {
     try {
       let res = await axios({
         method: "get",
-        url: `http://localhost:8080/seekers/${seeker_id}`,
+        url: `${process.env.REACT_APP_PORT}/seekers/${seeker_id}`,
         withCredentials: true,
         headers: {
           authorization: `Bearer ${cookies.JWT_TOKEN}`,
